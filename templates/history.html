@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Prediction History • JobGuard AI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root[data-theme="dark"] {
+      --bg:#0f172a; --surface:#1e293b; --card:#0b1323; --accent:#3b82f6;
+      --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.45);
+    }
+    :root[data-theme="light"] {
+      --bg:#f8fafc; --surface:#ffffff; --card:#eef2ff; --accent:#2563eb;
+      --text:#0f172a; --muted:#475569; --border:#e5e7eb; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.12);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; background:var(--bg); color:var(--text); }
+
+    /* Header */
+    header { position:sticky; top:0; z-index:50; background:var(--surface); border-bottom:1px solid var(--border); box-shadow:0 3px 14px var(--shadow); backdrop-filter:blur(6px); }
+    .nav { max-width:1440px; margin:0 auto; padding:20px 36px; display:flex; align-items:center; justify-content:space-between; }
+    .brand { font-weight:800; color:var(--accent); font-size:22px; display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .brand .pulse { width:10px; height:10px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7);} 70%{box-shadow:0 0 0 12px rgba(59,130,246,0);} 100%{box-shadow:0 0 0 0 rgba(59,130,246,0);} }
+    .nav-actions { display:flex; gap:12px; flex-wrap:wrap; }
+    .btn { padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); text-decoration:none; font-weight:700; font-size:14px; transition:all .12s ease; cursor:pointer; }
+    .btn:hover { background:var(--card); transform:translateY(-1px); }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--hover); }
+    .btn.primary:hover { filter:brightness(1.05); }
+
+    /* Container */
+    .container { max-width:1440px; margin:0 auto; padding:0 36px; }
+
+    /* Page header */
+    .page-header { padding:60px 0 40px; }
+    .page-title { font-size:48px; font-weight:900; margin:0 0 12px; letter-spacing:.3px; }
+    .page-subtitle { color:var(--muted); font-size:16px; }
+
+    /* Stats bar */
+    .stats-bar { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:16px; margin-bottom:48px; }
+    .stat-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; }
+    .stat-label { color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.3px; }
+    .stat-value { font-size:32px; font-weight:900; margin-top:8px; }
+    .stat-value.fake { color:var(--fake); }
+    .stat-value.real { color:var(--real); }
+
+    /* Filter & Search */
+    .controls { display:flex; gap:12px; margin-bottom:32px; flex-wrap:wrap; }
+    .search-box { flex:1; min-width:200px; }
+    .search-box input { width:100%; padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:14px; outline:none; transition:border .12s ease; }
+    .search-box input:focus { border-color:var(--accent); }
+    .filter-group { display:flex; gap:8px; }
+    .filter-btn { padding:12px 16px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-weight:700; font-size:14px; cursor:pointer; transition:all .12s ease; }
+    .filter-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .filter-btn:hover { background:var(--card); }
+
+    /* Table */
+    .table-container { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 8px 26px -6px var(--shadow); margin-bottom:48px; }
+    table { width:100%; border-collapse:collapse; }
+    thead { background:var(--card); }
+    th { padding:16px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); text-align:left; }
+    td { padding:16px; border-bottom:1px solid var(--border); }
+    tbody tr:hover { background:var(--card); }
+    tbody tr:last-child td { border-bottom:none; }
+
+    /* Badges */
+    .badge { display:inline-block; padding:6px 12px; border-radius:8px; font-weight:700; font-size:12px; }
+    .badge.fake { background:rgba(220,38,38,.15); color:var(--fake); border:1px solid rgba(220,38,38,.3); }
+    .badge.real { background:rgba(22,163,74,.15); color:var(--real); border:1px solid rgba(22,163,74,.3); }
+
+    /* Description cell */
+    .desc-cell { max-width:400px; word-break:break-word; color:var(--muted); font-size:13px; line-height:1.5; }
+
+    /* Confidence bar */
+    .conf-bar { width:100%; height:6px; border-radius:3px; background:var(--border); overflow:hidden; margin:4px 0; }
+    .conf-fill { height:100%; border-radius:3px; transition:width .3s ease; }
+    .conf-fill.fake { background:var(--fake); }
+    .conf-fill.real { background:var(--real); }
+    .conf-text { font-weight:700; font-size:12px; }
+
+    /* Empty state */
+    .empty-state { text-align:center; padding:60px 24px; }
+    .empty-icon { font-size:48px; margin-bottom:16px; }
+    .empty-text { color:var(--muted); font-size:16px; margin-bottom:8px; }
+    .empty-subtext { color:var(--muted); font-size:13px; }
+
+    /* Pagination */
+    .pagination { display:flex; gap:8px; justify-content:center; margin-top:32px; }
+    .pag-btn { padding:8px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; transition:all .12s ease; }
+    .pag-btn:hover { background:var(--card); }
+    .pag-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+    /* Footer */
+    footer { text-align:center; padding:48px 0 32px; color:var(--muted); border-top:1px solid var(--border); font-size:13px; }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .page-header { padding:40px 0 24px; }
+      .page-title { font-size:32px; }
+      .controls { flex-direction:column; }
+      .search-box { width:100%; }
+      .filter-group { width:100%; }
+      .filter-btn { flex:1; }
+      th, td { padding:12px 8px; font-size:12px; }
+      .desc-cell { max-width:200px; }
+      .stats-bar { grid-template-columns:1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="nav">
+      <a href="{{ url_for('home') }}" class="brand"><span class="pulse"></span> JobGuard AI</a>
+      <div class="nav-actions">
+        <button class="btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
+        <a href="{{ url_for('predict_form') }}" class="btn">← Analyze</a>
+        <a href="{{ url_for('home') }}" class="btn">Home</a>
+        {% if session.get('admin_logged_in') %}
+          <a href="{{ url_for('admin_dashboard') }}" class="btn">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+        {% else %}
+          <a href="{{ url_for('admin_login') }}" class="btn">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">📜 Prediction History</h1>
+      <p class="page-subtitle">View all your job listing analyses and predictions</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-box">
+        <div class="stat-label">Total Predictions</div>
+        <div class="stat-value" id="totalStat">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Fake Jobs Detected</div>
+        <div class="stat-value fake" id="fakeStat">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Real Jobs Found</div>
+        <div class="stat-value real" id="realStat">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Accuracy Rate</div>
+        <div class="stat-value" id="accuracyStat">—</div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Search job descriptions..." onkeyup="filterTable()">
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="filterByType('all')">All</button>
+        <button class="filter-btn" onclick="filterByType('Fake Job')">🚩 Fake</button>
+        <button class="filter-btn" onclick="filterByType('Real Job')">✓ Real</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      {% if records and records|length > 0 %}
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th style="min-width:140px;">Date & Time</th>
+              <th>Prediction</th>
+              <th style="min-width:120px;">Confidence</th>
+              <th>Job Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job, label, conf, time in records %}
+            <tr class="data-row" data-type="{{ label }}">
+              <td>
+                <span style="color:var(--text); font-weight:600;">{{ time }}</span>
+              </td>
+              <td>
+                <span class="badge {{ 'fake' if label=='Fake Job' else 'real' }}">
+                  {{ '⚠️ ' if label=='Fake Job' else '✓ ' }}{{ label }}
+                </span>
+              </td>
+              <td>
+                <div class="conf-bar">
+                  <div class="conf-fill {{ 'fake' if label=='Fake Job' else 'real' }}" style="width:{{ conf }}%"></div>
+                </div>
+                <div class="conf-text">{{ conf }}%</div>
+              </td>
+              <td class="desc-cell">{{ job[:120] }}{% if job|length > 120 %}...{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">No predictions yet</div>
+          <div class="empty-subtext">Start by analyzing a job listing to see it appear here</div>
+          <a href="{{ url_for('predict_form') }}" class="btn primary" style="margin-top:16px;">Analyze a Job</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <footer>© 2025 JobGuard AI • Secure Hiring Intelligence</footer>
+
+  <script>
+    // Theme toggle
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('jg-theme', next); } catch {}
+    }
+    (function() {
+      try {
+        const saved = localStorage.getItem('jg-theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch {}
+    })();
+
+    // Calculate stats
+    function updateStats() {
+      const rows = document.querySelectorAll('.data-row');
+      const total = rows.length;
+      const fake = Array.from(rows).filter(r => r.dataset.type === 'Fake Job').length;
+      const real = total - fake;
+
+      document.getElementById('totalStat').textContent = total;
+      document.getElementById('fakeStat').textContent = fake;
+      document.getElementById('realStat').textContent = real;
+      document.getElementById('accuracyStat').textContent = total > 0 ? ((real / total) * 100).toFixed(1) + '%' : '—';
+    }
+
+    // Filter by type
+    function filterByType(type) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const rows = document.querySelectorAll('.data-row');
+      rows.forEach(r => {
+        r.style.display = type === 'all' || r.dataset.type === type ? '' : 'none';
+      });
+    }
+
+    // Search filter
+    function filterTable() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('.data-row');
+      rows.forEach(r => {
+        const text = r.textContent.toLowerCase();
+        r.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', updateStats);
+  </script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>JobGuard AI • Home</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root[data-theme="dark"] {
+      --bg:#0f172a; --surface:#1e293b; --card:#0b1323; --accent:#3b82f6;
+      --text:#f1f5f9; --muted:#94a3b8; --border:#475569; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.45);
+    }
+    :root[data-theme="light"] {
+      --bg:#f8fafc; --surface:#ffffff; --card:#eef2ff; --accent:#2563eb;
+      --text:#0f172a; --muted:#475569; --border:#e5e7eb; --hover:#1d4ed8;
+      --fake:#dc2626; --real:#16a34a; --shadow:rgba(0,0,0,.12);
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:var(--bg); color:var(--text); }
+
+    /* Header */
+    header { position:sticky; top:0; z-index:50; background:var(--surface); border-bottom:1px solid var(--border); box-shadow:0 3px 14px var(--shadow); backdrop-filter: blur(6px); }
+    .nav { max-width:1440px; margin:0 auto; padding:24px 36px; display:flex; align-items:center; justify-content:space-between; }
+    .brand { font-weight:800; color:var(--accent); font-size:22px; display:flex; align-items:center; gap:12px; letter-spacing:.2px; }
+    .brand .pulse { width:12px; height:12px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 0 rgba(59,130,246,0.7); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7);} 70%{box-shadow:0 0 0 16px rgba(59,130,246,0);} 100%{box-shadow:0 0 0 0 rgba(59,130,246,0);} }
+    .nav-actions { display:flex; gap:14px; }
+    .btn { padding:14px 18px; border-radius:14px; border:1px solid var(--border); background:var(--surface); color:var(--text); text-decoration:none; font-weight:700; font-size:16px; transition:transform .12s ease, background .12s ease; }
+    .btn:hover { background:var(--card); transform:translateY(-1px); }
+    .btn.primary { background:var(--accent); color:#fff; border-color:var(--hover); }
+    .btn.primary:hover { filter:brightness(1.05); }
+
+    /* Hero */
+    .hero { position:relative; overflow:hidden; }
+    .hero-inner { max-width:1440px; margin:72px auto; padding:0 36px; display:grid; gap:48px; grid-template-columns: 1.35fr 1fr; align-items:center; }
+    .hero h1 { font-size:60px; line-height:1.12; margin:0 0 18px; letter-spacing:.2px; }
+    .hero p { color:var(--muted); font-size:21px; margin:0 0 30px; }
+    .hero-cta { display:flex; gap:16px; flex-wrap:wrap; }
+    .sparkle { position:absolute; inset:0; pointer-events:none; background:
+      radial-gradient(800px 300px at 10% -10%, rgba(59,130,246,.10), transparent 70%),
+      radial-gradient(550px 240px at 90% -20%, rgba(16,185,129,.10), transparent 70%);
+      opacity:.8;
+    }
+
+    /* Panel & Stats */
+    .panel { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:28px 30px; box-shadow:0 8px 26px -6px var(--shadow); }
+    .panel h3 { margin:0 0 16px; font-size:22px; display:flex; align-items:center; gap:10px; }
+    .stats {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr)); /* force 2 columns */
+      gap:24px;
+      margin-top:12px;
+    }
+    .stat { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:18px 20px; }
+    .stat .label { color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.3px; }
+    .stat .value { font-weight:800; font-size:34px; margin-top:8px; }
+    .badges { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+    .badge { display:inline-flex; align-items:center; gap:8px; border:1px dashed var(--border); border-radius:999px; padding:8px 12px; font-size:14px; color:var(--muted); }
+
+    /* Trust bar */
+    .trust { max-width:1440px; margin:0 auto; padding:0 36px 6px; }
+    .trust-row { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; opacity:.9; }
+    .pill { border:1px solid var(--border); background:var(--surface); color:var(--muted); padding:10px 14px; border-radius:999px; font-weight:700; font-size:14px; }
+
+    /* Features + Testimonials */
+    .sections { max-width:1440px; margin:36px auto 90px; padding:0 36px; display:grid; gap:36px; grid-template-columns: 1.35fr .9fr; }
+    .features { display:grid; gap:22px; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); }
+    .feature { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:22px; transition:transform .12s ease; }
+    .feature:hover { transform:translateY(-3px); }
+    .feature h4 { margin:0 0 10px; font-size:20px; display:flex; align-items:center; gap:10px; }
+    .feature p { margin:0; color:var(--muted); font-size:16px; }
+
+    .side { display:grid; gap:22px; }
+    .carousel { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:22px; }
+    .slide { display:none; }
+    .slide.active { display:block; }
+    .slide p { margin:0 0 10px; color:var(--muted); font-size:16px; }
+    .slide .author { font-weight:700; font-size:16px; }
+
+    /* How it works */
+    .how { max-width:1440px; margin:20px auto 70px; padding:0 36px; }
+    .how-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:18px; }
+    .step { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:18px; }
+    .step-num { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; background:var(--accent); }
+    .step h5 { margin:10px 0 6px; font-size:18px; }
+    .step p { margin:0; color:var(--muted); }
+
+    /* Recent activity ticker */
+    .activity { max-width:1440px; margin:0 auto 80px; padding:0 36px; }
+    .activity-card { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:12px 0; overflow:hidden; box-shadow:0 8px 26px -6px var(--shadow); }
+    .activity-header { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--border); }
+    .activity-title { font-weight:800; }
+    .ticker { position:relative; width:100%; overflow:hidden; }
+    .ticker-track { display:flex; gap:28px; white-space:nowrap; will-change:transform; animation:marquee 28s linear infinite; padding:14px 18px; }
+    .ticker-item { display:inline-flex; gap:10px; align-items:center; border:1px solid var(--border); background:var(--card); padding:10px 12px; border-radius:999px; color:var(--muted); }
+    .dot { width:8px; height:8px; border-radius:50%; background:var(--real); }
+    .dot.fake { background:var(--fake); }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Stacked Use Cases & Security sections */
+    .usecases-section { max-width:1440px; margin:0 auto 36px; padding:0 36px; }
+    .security-section { max-width:1440px; margin:0 auto 36px; padding:0 36px; }
+
+    .usecases, .pillars { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:22px; }
+
+    /* Single-row Use Cases */
+    .use-grid {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(220px,1fr)); /* single row of 4 */
+      gap:16px;
+      margin-top:10px;
+    }
+    .use { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:16px; }
+    .use h5 { margin:0 0 6px; font-size:16px; }
+    .use p { margin:0; color:var(--muted); font-size:14px; }
+
+    /* Single-row Security & Privacy */
+    .pillars-grid {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(220px,1fr)); /* single row of 4 */
+      gap:16px;
+      margin-top:10px;
+    }
+    .pill { display:flex; align-items:flex-start; gap:12px; border:1px solid var(--border); background:var(--card); border-radius:16px; padding:12px; }
+
+    /* FAQs */
+    .faq-section { max-width:1440px; margin:0 auto 90px; padding:0 36px; }
+    .faq { background:var(--surface); border:1px solid var(--border); border-radius:22px; padding:12px; }
+    .faq-item { border-bottom:1px solid var(--border); }
+    .faq-item:last-child { border-bottom:none; }
+    .faq-q { width:100%; text-align:left; background:transparent; border:none; color:var(--text); font-weight:800; font-size:18px; padding:16px; cursor:pointer; display:flex; align-items:center; justify-content:space-between; }
+    .faq-a { max-height:0; overflow:hidden; transition:max-height .24s ease; padding:0 16px; color:var(--muted); font-size:16px; }
+    .faq-item.open .faq-a { max-height:240px; padding-bottom:16px; }
+
+    /* CTA */
+    .cta { max-width:1440px; margin:0 auto 76px; padding:0 36px; }
+    .cta-box { background:linear-gradient(90deg, var(--accent), var(--hover)); color:#fff; border-radius:24px; padding:32px 34px; display:flex; align-items:center; justify-content:center; gap:24px; box-shadow:0 12px 32px -8px var(--shadow); text-align:center; }
+    .cta-title { font-weight:900; font-size:26px; margin:0 auto; text-align:center; }
+    .cta-actions { display:flex; gap:16px; flex-wrap:wrap; }
+
+    /* Footer */
+    footer { text-align:center; padding:48px 0 42px; color:var(--muted); border-top:1px solid var(--border); background:var(--surface); font-size:14px; }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .use-grid, .pillars-grid { grid-template-columns: repeat(2, minmax(220px,1fr)); } /* 2 per row on medium screens */
+    }
+    @media (max-width: 1060px) {
+      .hero-inner { grid-template-columns: 1fr; margin:64px auto; }
+      .sections { grid-template-columns: 1fr; }
+      .cta-box { flex-direction:column; align-items:center; }
+      .ticker-track { animation-duration: 36s; }
+    }
+    @media (max-width: 720px) {
+      .stats { grid-template-columns: 1fr; } /* stack on small screens */
+      .use-grid, .pillars-grid { grid-template-columns: 1fr; } /* stack items */
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="nav">
+      <div class="brand"><span class="pulse"></span> JobGuard AI</div>
+      <div class="nav-actions">
+        <button class="btn" id="themeToggle" onclick="toggleTheme()">🌓</button>
+        {% if session.get('admin_logged_in') %}
+          <a href="{{ url_for('predict_form') }}" class="btn">Make Predictions</a>
+          <a href="{{ url_for('admin_dashboard') }}" class="btn">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+        {% else %}
+          <a href="{{ url_for('predict_form') }}" class="btn">Make Predictions</a>
+          <a href="{{ url_for('admin_login') }}" class="btn">Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="sparkle" aria-hidden="true"></div>
+    <div class="hero-inner">
+      <div>
+        <h1>Detect Fake Job Listings with Confidence</h1>
+        <p>ML-powered screening to protect candidates and streamline hiring. Transparent logs, retraining history, and clear metrics built-in.</p>
+        <div class="hero-cta">
+          <a href="{{ url_for('predict_form') }}" class="btn primary">Make Predictions</a>
+          <a href="{{ url_for('history') }}" class="btn">View History</a>
+        </div>
+        <div class="badges">
+          <span class="badge">⚡ Fast Inference</span>
+          <span class="badge">🧪 Retraining Logs</span>
+          <span class="badge">🔒 Admin Controls</span>
+          <span class="badge">📈 Accuracy Tracking</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>📊 Live Stats</h3>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">Total Predictions</div>
+            <div class="value" id="countTotal">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Fake Jobs</div>
+            <div class="value" id="countFake" style="color:var(--fake)">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Real Jobs</div>
+            <div class="value" id="countReal" style="color:var(--real)">—</div>
+          </div>
+          <div class="stat">
+            <div class="label">Current Accuracy</div>
+            <div class="value" id="accNow">N/A</div>
+          </div>
+        </div>
+        <div class="badges" style="margin-top:12px;">
+          <span class="badge">Last Retrained: <strong>{% if last_retrain %}{{ last_retrain[1] }}{% else %}Never{% endif %}</strong></span>
+          <span class="badge">Source: <strong>{% if last_retrain %}{{ last_retrain[2] }}{% else %}-{% endif %}</strong></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust bar -->
+  <section class="trust">
+    <div class="trust-row">
+      <div class="pill">Verified Metrics</div>
+      <div class="pill">Audit-Ready Logs</div>
+      <div class="pill">Secure by Design</div>
+      <div class="pill">Fast Deployments</div>
+      <div class="pill">Lightweight Stack</div>
+    </div>
+  </section>
+
+  <!-- Features + Testimonials -->
+  <section class="sections">
+    <div class="features">
+      <div class="feature">
+        <h4>🧠 Accurate Classification</h4>
+        <p>TF-IDF + model pipeline trained on curated datasets to flag suspicious postings reliably.</p>
+      </div>
+      <div class="feature">
+        <h4>🔍 Transparent Metrics</h4>
+        <p>Every retraining event is logged with accuracy and source for auditability.</p>
+      </div>
+      <div class="feature">
+        <h4>🛠️ Admin Tools</h4>
+        <p>Dashboard to visualize trends, retrain safely with confirmation, and review logs.</p>
+      </div>
+      <div class="feature">
+        <h4>⚙️ Lightweight Stack</h4>
+        <p>Flask + SQLite + Joblib for fast local deployments and easy maintenance.</p>
+      </div>
+      <div class="feature">
+        <h4>🧯 Safety Checks</h4>
+        <p>Input validation prevents junk submissions and improves model robustness.</p>
+      </div>
+      <div class="feature">
+        <h4>🌙 Theme Toggle</h4>
+        <p>Dark/Light theme with persistence for better accessibility and comfort.</p>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="carousel" id="carousel">
+        <div class="slide active">
+          <p>“JobGuard AI helped us filter dozens of scam listings instantly.”</p>
+          <div class="author">— Hiring Ops</div>
+        </div>
+        <div class="slide">
+          <p>“Love the retraining logs. Clear, auditable, and fast to review.”</p>
+          <div class="author">— Compliance Lead</div>
+        </div>
+        <div class="slide">
+          <p>“Simple deployment and great visibility into predictions.”</p>
+          <div class="author">— Platform Admin</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how">
+    <div class="how-grid">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h5>Paste Job Text</h5>
+        <p>Provide the job description you want to verify.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h5>Model Analyzes</h5>
+        <p>We transform text to TF-IDF and run a trained classifier.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h5>Get Verdict</h5>
+        <p>Instant “Fake/Real” label with confidence score.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h5>Retrain Anytime</h5>
+        <p>Admins can retrain and track improvements in logs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Activity Ticker -->
+  <section class="activity">
+    <div class="activity-card">
+      <div class="activity-header">
+        <div class="activity-title">🔔 Recent Activity</div>
+        <a class="btn" href="{{ url_for('history') }}">Open History</a>
+      </div>
+      <div class="ticker">
+        <div class="ticker-track">
+          {% if recent is defined and recent %}
+            {% for r in recent %}
+              <div class="ticker-item">
+                <span class="dot {% if r[2] == 'Fake Job' %}fake{% endif %}"></span>
+                <span>{{ r[2] }}</span>
+                <span class="sep">•</span>
+                <span>{{ r[0] }}</span>
+                {% if r|length > 3 %}<span class="sep">•</span><span>{{ "%.0f"|format(r[3]) }}%</span>{% endif %}
+              </div>
+            {% endfor %}
+            {% for r in recent %}
+              <div class="ticker-item">
+                <span class="dot {% if r[2] == 'Fake Job' %}fake{% endif %}"></span>
+                <span>{{ r[2] }}</span>
+                <span class="sep">•</span>
+                <span>{{ r[0] }}</span>
+                {% if r|length > 3 %}<span class="sep">•</span><span>{{ "%.0f"|format(r[3]) }}%</span>{% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="ticker-item"><span class="dot"></span><span>Real Job</span><span class="sep">•</span><span>2025-12-05 12:00</span><span class="sep">•</span><span>95%</span></div>
+            <div class="ticker-item"><span class="dot fake"></span><span>Fake Job</span><span class="sep">•</span><span>2025-12-05 11:53</span><span class="sep">•</span><span>88%</span></div>
+            <div class="ticker-item"><span class="dot"></span><span>Real Job</span><span class="sep">•</span><span>2025-12-05 11:41</span><span class="sep">•</span><span>91%</span></div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases (single row of 4) -->
+  <section class="usecases-section">
+    <div class="usecases">
+      <h3 style="margin:0 0 8px;">🚀 Use Cases</h3>
+      <div class="use-grid">
+        <div class="use"><h5>Job Boards</h5><p>Auto-screen listings to keep your marketplace clean.</p></div>
+        <div class="use"><h5>HR Teams</h5><p>Verify inbound job texts from vendors or partners.</p></div>
+        <div class="use"><h5>Universities</h5><p>Protect students from scam internship postings.</p></div>
+        <div class="use"><h5>Recruitment Agencies</h5><p>Flag suspicious posts before pushing to clients.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security & Privacy (single row of 4) -->
+  <section class="security-section">
+    <div class="pillars">
+      <h3 style="margin:0 0 8px;">🛡️ Security & Privacy</h3>
+      <div class="pillars-grid">
+        <div class="pill"><div class="icon">🔒</div><div><strong>Admin-gated actions</strong><br><span style="color:var(--muted)">Only admins can retrain and view logs.</span></div></div>
+        <div class="pill"><div class="icon">🧾</div><div><strong>Audit-ready logs</strong><br><span style="color:var(--muted)">Each retrain is stored with accuracy and source.</span></div></div>
+        <div class="pill"><div class="icon">🧹</div><div><strong>Input validation</strong><br><span style="color:var(--muted)">Basic checks reduce spammy submissions.</span></div></div>
+        <div class="pill"><div class="icon">⚙️</div><div><strong>Lightweight stack</strong><br><span style="color:var(--muted)">Flask + SQLite for quick, local deployment.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQs (below Security & Privacy) -->
+  <section class="faq-section">
+    <div class="faq">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">How accurate is the model? <span>+</span></button>
+        <div class="faq-a">Accuracy depends on your latest training data. See “Current Accuracy” in Live Stats and detailed records in Training Logs.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Do I need to log in to make predictions? <span>+</span></button>
+        <div class="faq-a">No. Predictions and history are public. Only admin pages like Dashboard, Retrain, and Logs require login.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can I retrain with my dataset? <span>+</span></button>
+        <div class="faq-a">Yes. Admins can upload datasets on the Dashboard. Each retrain event logs accuracy, timestamp, and source.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What data do you store? <span>+</span></button>
+        <div class="faq-a">For each prediction, we store timestamp, job text, label, and confidence. You can purge or review via admin tools.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-box">
+      <div class="cta-title">Start screening job posts in seconds</div>
+    </div>
+  </section>
+
+  <footer>© 2025 JobGuard AI • Secure Hiring Intelligence</footer>
+
+  <script>
+    // Theme toggle persistence
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-theme') || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      try { localStorage.setItem('jg-theme', next); } catch {}
+    }
+    (function initTheme() {
+      try {
+        const saved = localStorage.getItem('jg-theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+      } catch {}
+    })();
+
+    // Animated counters
+    function animateCount(el, to, duration = 800) {
+      const start = 0;
+      const diff = to - start;
+      const startTs = performance.now();
+      function step(now) {
+        const p = Math.min((now - startTs) / duration, 1);
+        el.textContent = Math.round(start + diff * p);
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const total = {{ total if total is defined else 0 }};
+      const fake = {{ fake if fake is defined else 0 }};
+      const real = {{ real if real is defined else 0 }};
+      const acc = {% if last_retrain %}{{ "%.2f"|format(last_retrain[0]) }}{% else %}null{% endif %};
+
+      const elTotal = document.getElementById('countTotal');
+      const elFake = document.getElementById('countFake');
+      const elReal = document.getElementById('countReal');
+      const elAcc = document.getElementById('accNow');
+
+      if (elTotal) animateCount(elTotal, total);
+      if (elFake) animateCount(elFake, fake);
+      if (elReal) animateCount(elReal, real);
+      if (elAcc) elAcc.textContent = acc ? acc + '%' : 'N/A';
+    });
+
+    // Testimonials carousel (auto-rotate)
+    (function carousel() {
+      const slides = Array.from(document.querySelectorAll('#carousel .slide'));
+      let i = 0;
+      setInterval(() => {
+        if (!slides.length) return;
+        slides[i].classList.remove('active');
+        i = (i + 1) % slides.length;
+        slides[i].classList.add('active');
+      }, 3500);
+    })();
+
+    // FAQ accordion
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+      btn.querySelector('span').textContent = item.classList.contains('open') ? '−' : '+';
+    }
+  </script>
+</body>
+</html>
